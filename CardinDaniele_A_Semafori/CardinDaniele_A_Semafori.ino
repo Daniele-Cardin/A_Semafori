@@ -1,79 +1,95 @@
-void setup() {
-  // put your setup code here, to run once:
-  pinMode(12,OUTPUT);
-  pinMode(11,OUTPUT);
-  pinMode(10,OUTPUT);
-  pinMode(9,OUTPUT);
-  pinMode(8,OUTPUT);
-  pinMode(7,OUTPUT);
-  Serial.begin(9600);
-  Serial.println("seriale attivata");
-}
  int ledRosso1 = 10;
  int ledRosso2 = 7;
  int ledGiallo1 = 11;
  int ledGiallo2 = 8;
  int ledVerde1 = 12;
  int ledVerde2 = 9;
- int delayDuemila = 2000;
- int delayLampeggio = 250;
+ int tempoLampeggi;
  int numeroLampeggi;
- String incomingByte;
+ int tempoGiallo;
+ int tempoAcceso;
+ int tempoRossoVerde;
+ String tempoGialloS;
  String numeroLampeggiS;
-void loop() {
-  // put your main code here, to run repeatedly:
-
+ String tempoLampeggiS;
+ String tempoAccesoS;
+ 
+void setup() {
+  // put your setup code here, to run once:
+  pinMode(ledVerde1,OUTPUT);
+  pinMode(ledGiallo1,OUTPUT);
+  pinMode(ledRosso1,OUTPUT);
+  pinMode(ledVerde2,OUTPUT);
+  pinMode(ledGiallo2,OUTPUT);
+  pinMode(ledRosso2,OUTPUT);
+  Serial.begin(9600);
+  Serial.println("seriale attivata");
+}
+    void assegnazioneTempi(){ 
     Serial.println("Quanti lampeggi deve eseguire il led verde?");
-    while(incomingByte == "") {
-    incomingByte = Serial.readString();
-    }
-    Serial.println("Numero lampeggi: ");
-    Serial.println(incomingByte.toInt());
-
-        Serial.println("Per quanto tempo deve rimanere acceso il led verde durante il lampeggio?");
     while(numeroLampeggiS == "") {
     numeroLampeggiS = Serial.readString();
     }
     Serial.println("Numero lampeggi: ");
-    Serial.println(numeroLampeggiS.toInt());
-    
-        Serial.println("Qunato tempo deve rimanere il giallo?");
-    while(incomingByte == "") {
-    incomingByte = Serial.readString();
-    }
-    Serial.println("Numero lampeggi: ");
-    Serial.println(incomingByte.toInt());
+    Serial.println(numeroLampeggiS);
 
-        Serial.println("Quanto tempo deve rimanere acceso il semaforo");
-    while(incomingByte == "") {
-    incomingByte = Serial.readString();
+    Serial.println("Per quanto tempo deve rimanere acceso il led verde durante il lampeggio?");
+    while(tempoLampeggiS == "") {
+    tempoLampeggiS = Serial.readString();
     }
-    Serial.println("Numero lampeggi: ");
-    Serial.println(incomingByte.toInt());
+    Serial.println("Tempo dei lampeggi: ");
+    Serial.println(tempoLampeggiS);
     
-  numeroLampeggi = incomingByte.toInt();
-  Fase1(ledRosso1, ledVerde2, ledGiallo1, ledGiallo2);
-  Fase1(ledRosso2, ledVerde1, ledGiallo2, ledGiallo1);
+    Serial.println("Qunato tempo deve rimanere il giallo?");
+    while(tempoGialloS == "") {
+    tempoGialloS = Serial.readString();
+    }
+    Serial.println("I led gialli stanno accesi: ");
+    Serial.println(tempoGialloS);
+
+    Serial.println("Quanto tempo deve rimanere acceso il semaforo?");
+    while(tempoAccesoS == "") {
+    tempoAccesoS = Serial.readString();
+    }
+    Serial.println("Il semaforo rimane acceso per: ");
+    Serial.println(tempoAccesoS);
+    
+    numeroLampeggi = numeroLampeggiS.toInt();
+    tempoLampeggi = tempoLampeggiS.toInt();
+    tempoGiallo = tempoGialloS.toInt();
+    tempoAcceso = tempoAccesoS.toInt();
+    tempoRossoVerde = (tempoAcceso - tempoGiallo * 2 - tempoLampeggi * 2) / 2 / 3;
+
 }
 
-void Fase1(int led1, int led2, int led3, int led4) 
+void fase1(int led1, int led2, int led3, int led4) 
 {
   digitalWrite(led1,HIGH);
   digitalWrite(led2,HIGH);
-  delay(delayDuemila);
+  delay(tempoRossoVerde);
   
   for (int i = 0; i < numeroLampeggi; i++)
   {
   digitalWrite(led2,LOW);
-  delay(delayLampeggio);
+  delay(tempoLampeggi);
   digitalWrite(led2,HIGH);
-  delay(delayLampeggio);
+  delay(tempoLampeggi);
   } 
   digitalWrite(led3,HIGH); 
   digitalWrite(led2,LOW);
   digitalWrite(led4,HIGH);
-  delay(2000);
+  delay(tempoGiallo);
   digitalWrite(led1,LOW);
   digitalWrite(led3,LOW);
   digitalWrite(led4,LOW);
+}
+void loop() {
+  // put your main code here, to run repeatedly:
+  assegnazioneTempi();
+  fase1(ledRosso1, ledVerde2, ledGiallo1, ledGiallo2);
+  fase1(ledRosso2, ledVerde1, ledGiallo2, ledGiallo1);
+  numeroLampeggiS = "";
+  tempoLampeggiS = "";
+  tempoGialloS = "";
+  tempoAccesoS = "";
 }
